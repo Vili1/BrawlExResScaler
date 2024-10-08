@@ -27,7 +27,7 @@ int SubVal = 15;
 int PrefVer = 0;
 int DownScaleLimit = 25;
 
-// Function to load values from Rescfg.txt
+// loads the config
 void loadConfig() {
     std::ifstream configFile("Rescfg.txt");
     if (configFile.is_open()) {
@@ -38,30 +38,30 @@ void loadConfig() {
             if (std::getline(iss, key, '=')) {
                 std::string value;
                 if (std::getline(iss, value)) {
-                    // Remove any potential whitespace
+                    // remove any potential whitespace
                     key.erase(std::remove_if(key.begin(), key.end(), isspace), key.end());
                     value.erase(std::remove_if(value.begin(), value.end(), isspace), value.end());
 
-                    // Parse values based on key
-                    if (key == "PrefVer") {
+                    // parse values based on key
+                    if (key == "PrefVer") { // 1 = normal version, 2 = tech-test version
                         PrefVer = std::stoi(value);
                     }
-                    else if (key == "TargetFPS") {
+                    else if (key == "TargetFPS") { // your fps target it can be anything below 1000 , preferably the refresh rate of ur monitor
                         TargetFPS = std::stof(value);
                     }
-                    else if (key == "BuffFPS") {
+                    else if (key == "BuffFPS") { // thats an offset so once the res is downscaled and the fps recovers , it doesn't upscale back to the previous ress and cause lag spikes
                         BuffFPS = std::stof(value);
                     }
-                    else if (key == "LoopSpeed") {
+                    else if (key == "LoopSpeed") { // controlling the main loop speed in milli seconds, it effects only the speed which ur game is being down scaled
                         LoopSpeed = std::stoi(value);
                     }
-                    else if (key == "AddVal") {
+                    else if (key == "AddVal") { // thats how much the program is allowed to upscale per every loop iteration 
                         AddVal = std::stoi(value);
                     }
-                    else if (key == "SubVal") {
+                    else if (key == "SubVal") { // thats how much the program is allowed to downscale per every loop iteration
                         SubVal = std::stoi(value);
                     }
-                    else if (key == "DownScaleLimit") {
+                    else if (key == "DownScaleLimit") { // this makes it so the resolution doesn't drop under a set limit, anything below 1% breaks the game rendering
                         DownScaleLimit = std::stoi(value);
                     }
                 }
@@ -189,7 +189,7 @@ void initMain() {
         std::cout << "-----------------------------------------------------------" << "\n";
         std::cin >> ptrSelect;
     }
-    //select game version   
+    //select game version if config isn't pressent
     if (ptrSelect == 1) {
         SetConsoleTitle("Normal version");
         XtoScaleAddress = iniPRT(moduleName, 0x01331740, { 0x28, 0x14, 0x154, 0x14, 0x78, 0x50, 0x34, 0x2A4 });
@@ -222,7 +222,7 @@ int main() {
     //main loop
     while (true) {
         std::this_thread::sleep_for(std::chrono::milliseconds(LoopSpeed));
-        ReadProcessMemory(processHandle, (LPCVOID)(FPSAddress), &FPSval, sizeof(float), NULL);
+        ReadProcessMemory(processHandle, (LPCVOID)(FPSAddress), &FPSval, sizeof(float), NULL); // reading the FPS every loop, sadly that value doesn't update that fast in the dll 
 
         if (FPSval < TargetFPS && scale > DownScaleLimit) {
             scale -= SubVal;
