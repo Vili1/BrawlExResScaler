@@ -1,0 +1,7 @@
+PrefVer=2
+TargetFPS=244
+BuffFPS=25
+LoopSpeed=100
+AddVal=15
+SubVal=15
+DownScaleLimit=25
