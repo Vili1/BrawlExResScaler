@@ -43,22 +43,19 @@ void loadConfig() {
                     value.erase(std::remove_if(value.begin(), value.end(), isspace), value.end());
 
                     // parse values based on key
-                    if (key == "PrefVer") { // 1 = normal version, 2 = tech-test version
-                        PrefVer = std::stoi(value);
-                    }
-                    else if (key == "TargetFPS") { // your fps target it can be anything below 1000 , preferably the refresh rate of ur monitor
+                    if (key == "TargetFPS") { // your fps target: it can be anything below 1000, preferably the refresh rate of your monitor
                         TargetFPS = std::stof(value);
                     }
-                    else if (key == "BuffFPS") { // thats an offset so once the res is downscaled and the fps recovers , it doesn't upscale back to the previous ress and cause lag spikes
+                    else if (key == "BuffFPS") { // that's an offset, so once the res is downscaled and the fps recovers, it doesn't upscale back to the previous res and cause lag spikes
                         BuffFPS = std::stof(value);
                     }
-                    else if (key == "LoopSpeed") { // controlling the main loop speed in milli seconds, it effects only the speed which ur game is being down scaled
+                    else if (key == "LoopSpeed") { // controlling the main loop speed in milliseconds, it effects only the speed which your game is being downscaled
                         LoopSpeed = std::stoi(value);
                     }
-                    else if (key == "AddVal") { // thats how much the program is allowed to upscale per every loop iteration 
+                    else if (key == "AddVal") { // that's how much the program is allowed to upscale per every loop iteration
                         AddVal = std::stoi(value);
                     }
-                    else if (key == "SubVal") { // thats how much the program is allowed to downscale per every loop iteration
+                    else if (key == "SubVal") { // that's how much the program is allowed to downscale per every loop iteration
                         SubVal = std::stoi(value);
                     }
                     else if (key == "DownScaleLimit") { // this makes it so the resolution doesn't drop under a set limit, anything below 1% breaks the game rendering
@@ -94,7 +91,7 @@ uintptr_t dwGetModuleBaseAddress(TCHAR* lpszModuleName, uintptr_t pID) {
     return dwModuleBaseAddress;
 }
 
-//finds the game window and spits out errors if its not fond
+//finds the game window and spits out errors if its not found
 void findGameWindow() {
     if (hGameWindow != NULL) {
         std::cout << "Brawlhalla found successfully!" << "\n";
@@ -145,7 +142,7 @@ std::pair<int, int> resScale(float Fwidth, float Fheight) {
     return std::make_pair(width, height);
 }
 
-//the menu function, just a crappy cout stuff 
+//the menu function, just a crappy cout stuff
 void menu() {
     while (true) {
         system("cls");
@@ -153,7 +150,6 @@ void menu() {
         std::cout << "-----------------------------------------------------------" << "\n";
         std::cout << "Current cfg" << "\n";
         std::cout << "-----------------------------------------------------------" << "\n";
-        std::cout << "Preferred game version: " << PrefVer << "\n";
         std::cout << "Target FPS: " << TargetFPS << "\n";
         std::cout << "Buffer FPS: " << BuffFPS << "\n";
         std::cout << "Loop Speed: " << LoopSpeed << "\n";
@@ -175,34 +171,9 @@ void menu() {
 void initMain() {
     loadConfig();
     findGameWindow();
-    int ptrSelect = 0;
-
-    if (PrefVer != 0) {
-        ptrSelect = PrefVer;
-    }
-    else {
-        std::cout << "-----------------------------------------------------------" << "\n";
-        std::cout << "Select a version" << "\n";
-        std::cout << "-----------------------------------------------------------" << "\n";
-        std::cout << "1. Normal version" << "\n";
-        std::cout << "2. Tech-test version" << "\n";
-        std::cout << "-----------------------------------------------------------" << "\n";
-        std::cin >> ptrSelect;
-    }
-    //select game version if config isn't pressent
-    if (ptrSelect == 1) {
-        SetConsoleTitle("Normal version");
-        XtoScaleAddress = iniPRT(moduleName, 0x01331740, { 0x28, 0x14, 0x154, 0x14, 0x78, 0x50, 0x34, 0x2A4 });
-    }
-    else if (ptrSelect == 2) {
-        SetConsoleTitle("Tech-test version");
-        XtoScaleAddress = iniPRT(moduleName, 0x012DAACC, { 0x170, 0x268, 0x78, 0x50, 0x34, 0x2B8 });
-    }
-    else {
-        std::cout << "Invalid value" << "\n";
-        std::this_thread::sleep_for(std::chrono::milliseconds(3000));
-        exit(EXIT_FAILURE);
-    }
+    SetConsoleTitle("Normal version");
+    //init the res pointer
+    XtoScaleAddress = iniPRT(moduleName, 0x01331740, { 0x28, 0x14, 0x154, 0x14, 0x78, 0x50, 0x34, 0x2A4 });
     //init the pointer to the FPS address
     FPSAddress = iniPRT(moduleName2, 0x00130F3C, { 0x18 });
     //reading the game resolution and storing it to X and Y ScaleValDef so we can reset back to default res
