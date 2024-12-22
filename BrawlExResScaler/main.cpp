@@ -11,7 +11,7 @@
 //some global vars
 HWND hGameWindow = FindWindow(NULL, "Brawlhalla");
 char moduleName[] = "Adobe AIR.dll";
-char moduleName2[] = "gameoverlayrenderer.dll";
+char moduleName2[] = "gameoverlayrenderer64.dll";
 DWORD pID = NULL;
 HANDLE processHandle = NULL;
 uintptr_t XtoScaleAddress = NULL;
@@ -173,9 +173,9 @@ void initMain() {
     findGameWindow();
     SetConsoleTitle("Normal version");
     //init the res pointer
-    XtoScaleAddress = iniPRT(moduleName, 0x01331740, { 0x28, 0x14, 0x154, 0x14, 0x78, 0x50, 0x34, 0x2A4 });
+    XtoScaleAddress = iniPRT(moduleName, 0x01219038, { 0x288, 0x3D0, 0x1C0, 0x100, 0x408 });
     //init the pointer to the FPS address
-    FPSAddress = iniPRT(moduleName2, 0x00130F3C, { 0x18 });
+    FPSAddress = iniPRT(moduleName2, 0x0017A668, { 0x18 });
     //reading the game resolution and storing it to X and Y ScaleValDef so we can reset back to default res
     ReadProcessMemory(processHandle, (LPCVOID)(XtoScaleAddress), &XtoScaleValDef, sizeof(int), NULL);
     ReadProcessMemory(processHandle, (LPCVOID)(XtoScaleAddress + 4), &YtoScaleValDef, sizeof(int), NULL);
@@ -199,9 +199,9 @@ int main() {
             scale -= SubVal;
             std::pair<int, int> Scaleresult = resScale(XtoScaleValDef, YtoScaleValDef);
             WriteProcessMemory(processHandle, (LPVOID)(XtoScaleAddress), &Scaleresult.first, sizeof(int), 0);
-            WriteProcessMemory(processHandle, (LPVOID)(XtoScaleAddress - 132), &Scaleresult.first, sizeof(int), 0);
+            WriteProcessMemory(processHandle, (LPVOID)(XtoScaleAddress - 152), &Scaleresult.first, sizeof(int), 0);
             WriteProcessMemory(processHandle, (LPVOID)(XtoScaleAddress + 4), &Scaleresult.second, sizeof(int), 0);
-            WriteProcessMemory(processHandle, (LPVOID)(XtoScaleAddress - 128), &Scaleresult.second, sizeof(int), 0);
+            WriteProcessMemory(processHandle, (LPVOID)(XtoScaleAddress - 148), &Scaleresult.second, sizeof(int), 0);
             XtoScaleVal = Scaleresult.first;
             YtoScaleVal = Scaleresult.second;
         }
@@ -210,9 +210,9 @@ int main() {
             scale += AddVal;
             std::pair<int, int> Scaleresult = resScale(XtoScaleValDef, YtoScaleValDef);
             WriteProcessMemory(processHandle, (LPVOID)(XtoScaleAddress), &Scaleresult.first, sizeof(int), 0);
-            WriteProcessMemory(processHandle, (LPVOID)(XtoScaleAddress - 132), &Scaleresult.first, sizeof(int), 0);
+            WriteProcessMemory(processHandle, (LPVOID)(XtoScaleAddress - 152), &Scaleresult.first, sizeof(int), 0);
             WriteProcessMemory(processHandle, (LPVOID)(XtoScaleAddress + 4), &Scaleresult.second, sizeof(int), 0);
-            WriteProcessMemory(processHandle, (LPVOID)(XtoScaleAddress - 128), &Scaleresult.second, sizeof(int), 0);
+            WriteProcessMemory(processHandle, (LPVOID)(XtoScaleAddress - 148), &Scaleresult.second, sizeof(int), 0);
             XtoScaleVal = Scaleresult.first;
             YtoScaleVal = Scaleresult.second;
         }
